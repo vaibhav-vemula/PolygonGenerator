@@ -8,34 +8,36 @@ from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
-def generatePolygon( ctrX, ctrY, aveRadius, irregularity, spikeyness, numVerts ) :
-    irregularity =  irregularity * 2*math.pi / numVerts
-    spikeyness = spikeyness * aveRadius
-    # generate n angle steps
-    angleSteps = []
-    lower = (2*math.pi / numVerts) - irregularity
-    upper = (2*math.pi / numVerts) + irregularity
-    sum = 0
-    for i in range(numVerts) :
-        tmp = random.uniform(lower, upper)
-        angleSteps.append( tmp )
-        sum = sum + tmp
-    # normalize the steps so that point 0 and point n+1 are the same
-    k = sum / (2*math.pi)
-    for i in range(numVerts) :
-        angleSteps[i] = angleSteps[i] / k
-    # now generate the points
+
+def genPolygon( X, Y, radius, irregular, spike, n) :
+
+    irregular = irregular* 2*math.pi / n
+    spike = spike * radius
+
+    # generate n angle between the random limits
+    angles = []
+    low = (2*math.pi / n) - irregular
+    high = (2*math.pi / n) + irregular
+
+    for i in range(n) :
+        temp = random.uniform(low, high)
+        angles.append( temp )
+
+    #adding first vertice to end of list to make a closed polygon.
+    angles.append(angles[0])
+    
+    #generating points
     points = []
-    angle = random.uniform(0, 2*math.pi)
-    for i in range(numVerts) :
-        r_i =  random.gauss(aveRadius, spikeyness)
-        x =  ctrX + r_i*math.cos(angle)
-        y = ctrY + r_i*math.sin(angle)
-        points.append( (int(x),int(y)) )
-        angle = angle + angleSteps[i]
+    angle = random.uniform(0, 2 * math.pi)
+    for i in range(n) :
+        r_i = random.gauss(radius, spike)
+        x =  X + r_i*math.cos(angle)
+        y = Y + r_i*math.sin(angle)
+        points.append((x,y))
+        angle = angle + angles[i]
 
     return points
 
-verts = generatePolygon( ctrX=100, ctrY=100, aveRadius=200, irregularity=1, spikeyness=0.11, numVerts=50 )
+verts = genPolygon( X=50, Y=100, radius=400, irregular=0.2, spike=0.03, n=100 )
 pa = Polygon(verts)
-print(pa)
+print(pa.wkt)
